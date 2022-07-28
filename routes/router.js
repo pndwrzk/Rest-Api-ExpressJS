@@ -10,5 +10,6 @@ router.delete("/foods/:id", foodsController.deleteFood);
 
 // users route
 router.post("/users", usersController.createUser);
+router.post("/login", usersController.login);
 
 module.exports = router;

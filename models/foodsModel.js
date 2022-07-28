@@ -14,7 +14,7 @@ const getAllFoods = async (id) => {
   if (!id) {
     data = await foodsModel.findAll();
   } else {
-    data = await foodsModel.findAll({
+    data = await foodsModel.findOne({
       where: {
         id: id,
       },
