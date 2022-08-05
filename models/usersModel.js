@@ -7,6 +7,7 @@ const usersModel = db.define("users", {
   nama: { type: sequelize.STRING },
   username: { type: sequelize.STRING },
   password: { type: sequelize.STRING },
+  refresh_token: { type: sequelize.STRING },
 });
 
 const addUser = async (user) => {
@@ -30,7 +31,21 @@ const getUserByUsername = async (username) => {
   return data;
 };
 
+const updateRefreshToken = async (id, token) => {
+  await usersModel.update(
+    {
+      refresh_token: token,
+    },
+    {
+      where: {
+        id: id,
+      },
+    }
+  );
+};
+
 module.exports = {
   addUser,
   getUserByUsername,
+  updateRefreshToken,
 };

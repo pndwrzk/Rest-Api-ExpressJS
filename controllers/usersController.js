@@ -2,7 +2,7 @@ const Joi = require("@hapi/joi");
 const usersModel = require("../models/usersModel");
 const userValidation = require("../middleware/userValidation");
 const bcrypt = require("bcrypt");
-
+const jwt = require("jsonwebtoken");
 const createUser = async (req, res) => {
   try {
     const error = userValidation(req.body);
@@ -52,7 +52,35 @@ const login = async (req, res) => {
         message: "password yang anda masukan salah",
       });
     }
-    console.log("user succes login");
+
+    const userId = user.id;
+    const nama = user.nama;
+    const email = user.email;
+
+    const accessToken = await jwt.sign(
+      { userId, nama, email },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: "15s",
+      }
+    );
+
+    const refreshToken = await jwt.sign(
+      { userId, nama, email },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    await usersModel.updateRefreshToken(userId, refreshToken);
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({ accessToken: accessToken });
   } catch (error) {
     return res.status(500).send(error);
   }
